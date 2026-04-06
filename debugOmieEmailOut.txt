@@ -1,0 +1,25 @@
+[dotenv@17.3.1] injecting env (16) from .env -- tip: ⚙️  specify custom .env file path with { path: '/custom/path/.env' }
+=== CAMPOS DE CONTATO DISPONÍVEIS NA API OMIE ===
+[
+  [
+    "contato",
+    "Paulo"
+  ],
+  [
+    "email",
+    "seuemail@empresa.com.br"
+  ],
+  [
+    "telefone1_ddd",
+    "11"
+  ],
+  [
+    "telefone1_numero",
+    "3775.7888"
+  ]
+]
+
+=== PRIMEIRO CLIENTE (campos principais) ===
+razao_social: Equipamentos e Serviços em Informática Ltda
+nome_fantasia: EquiServ Informática
+email (campo usado no sync): seuemail@empresa.com.br

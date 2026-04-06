@@ -1,0 +1,146 @@
+{
+  "ics": {
+    "pagina": "1",
+    "total_de_paginas": 1,
+    "registros": 5,
+    "total_de_registros": 5,
+    "conta_corrente_lista": [
+      {
+        "cCategoria": "1.01.03",
+        "codigo_banco": "999",
+        "descricao": "Caixinha",
+        "nCodCC": 11456062718,
+        "tipo": "CX"
+      },
+      {
+        "codigo_agencia": "001",
+        "codigo_banco": "033",
+        "conta_corrente": "001444-1",
+        "descricao": "Santander",
+        "nCodCC": 11456062719,
+        "tipo": "CC",
+        "valor_limite": 30000
+      },
+      {
+        "codigo_agencia": "0022",
+        "codigo_banco": "237",
+        "conta_corrente": "030888-7",
+        "descricao": "Bradesco",
+        "nCodCC": 11456062720,
+        "tipo": "CC",
+        "valor_limite": 30000
+      },
+      {
+        "cCategoria": "1.01.03",
+        "codigo_banco": "986",
+        "descricao": "Master - BNDES",
+        "nCodCC": 11456062721,
+        "tipo": "AC"
+      },
+      {
+        "codigo_agencia": "1234",
+        "codigo_banco": "450",
+        "conta_corrente": "12345678-9",
+        "descricao": "Omie.CASH",
+        "nCodCC": 11456062722,
+        "tipo": "CC"
+      }
+    ]
+  },
+  "authen": {
+    "pagina": "1",
+    "total_de_paginas": 1,
+    "registros": 5,
+    "total_de_registros": 5,
+    "conta_corrente_lista": [
+      {
+        "cCategoria": "1.01.03",
+        "codigo_banco": "999",
+        "descricao": "Caixinha",
+        "nCodCC": 9622982195,
+        "tipo": "CX"
+      },
+      {
+        "codigo_agencia": "001",
+        "codigo_banco": "033",
+        "conta_corrente": "001444-1",
+        "descricao": "Santander",
+        "nCodCC": 9622982196,
+        "tipo": "CC",
+        "valor_limite": 30000
+      },
+      {
+        "codigo_agencia": "0022",
+        "codigo_banco": "237",
+        "conta_corrente": "030888-7",
+        "descricao": "Bradesco",
+        "nCodCC": 9622982197,
+        "tipo": "CC",
+        "valor_limite": 30000
+      },
+      {
+        "cCategoria": "1.01.03",
+        "codigo_banco": "986",
+        "descricao": "Master - BNDES",
+        "nCodCC": 9622982198,
+        "tipo": "AC"
+      },
+      {
+        "codigo_agencia": "1234",
+        "codigo_banco": "450",
+        "conta_corrente": "12345678-9",
+        "descricao": "Omie.CASH",
+        "nCodCC": 9622982199,
+        "tipo": "CC"
+      }
+    ]
+  },
+  "target": {
+    "pagina": "1",
+    "total_de_paginas": 1,
+    "registros": 5,
+    "total_de_registros": 5,
+    "conta_corrente_lista": [
+      {
+        "cCategoria": "1.01.03",
+        "codigo_banco": "999",
+        "descricao": "Caixinha",
+        "nCodCC": 1752876421,
+        "tipo": "CX"
+      },
+      {
+        "codigo_agencia": "001",
+        "codigo_banco": "033",
+        "conta_corrente": "001444-1",
+        "descricao": "Santander",
+        "nCodCC": 1752876422,
+        "tipo": "CC",
+        "valor_limite": 30000
+      },
+      {
+        "codigo_agencia": "0022",
+        "codigo_banco": "237",
+        "conta_corrente": "030888-7",
+        "descricao": "Bradesco",
+        "nCodCC": 1752876423,
+        "tipo": "CC",
+        "valor_limite": 30000
+      },
+      {
+        "cCategoria": "1.01.03",
+        "codigo_banco": "986",
+        "descricao": "Master - BNDES",
+        "nCodCC": 1752876424,
+        "tipo": "AC"
+      },
+      {
+        "codigo_agencia": "1234",
+        "codigo_banco": "450",
+        "conta_corrente": "12345678-9",
+        "descricao": "Omie.CASH",
+        "nCodCC": 1752876425,
+        "tipo": "CC"
+      }
+    ]
+  }
+}

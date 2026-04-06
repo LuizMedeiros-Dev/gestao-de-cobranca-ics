@@ -1,0 +1,3 @@
+Default export type: object
+Default keys: virtualfs, urlAccessPolicy
+Wildcard keys: default, module.exports

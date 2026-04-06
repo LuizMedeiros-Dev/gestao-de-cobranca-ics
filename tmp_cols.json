@@ -1,0 +1,1 @@
+[{"column_name":"id"},{"column_name":"codigo_omie"},{"column_name":"codigo_cliente_omie"},{"column_name":"cliente_id"},{"column_name":"numero_documento"},{"column_name":"valor_documento"},{"column_name":"data_emissao"},{"column_name":"data_vencimento"},{"column_name":"data_pagamento"},{"column_name":"status_titulo"},{"column_name":"criado_em"}]

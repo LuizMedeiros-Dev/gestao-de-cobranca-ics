@@ -1,0 +1,4 @@
+{
+  "faultstring": "ERROR: API bloqueada por consumo indevido. Tente novamente em 1740 segundos.",
+  "faultcode": "MISUSE_API_PROCESS"
+}

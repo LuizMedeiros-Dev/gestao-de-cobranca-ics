@@ -1,0 +1,4 @@
+[dotenv@17.3.1] injecting env (16) from .env -- tip: ⚙️  enable debug logging with { debug: true }
+Iniciando teste de envio de e-mail via Gmail...
+Erro na conexão com SMTP: Invalid login: 535-5.7.8 Username and Password not accepted. For more information, go to
+535 5.7.8  https://support.google.com/mail/?p=BadCredentials a92af1059eb24-12ab983f904sm18505698c88.9 - gsmtp

@@ -1,0 +1,21 @@
+[dotenv@17.3.1] injecting env (16) from .env -- tip: 🛡️ auth for agents: https://vestauth.com
+Iniciando teste de envio de e-mail via Resend...
+Conexão SMTP validada com sucesso!
+[Email] Enviado para luizics@outlook.com — ID: <a980370a-87cc-d7b2-d247-22b5638094c5@resend.dev>
+Resultado do envio: {
+  accepted: [ 'luizics@outlook.com' ],
+  rejected: [],
+  ehlo: [
+    'PIPELINING',
+    '8BITMIME',
+    'SMTPUTF8',
+    'AUTH PLAIN LOGIN',
+    'SIZE 41943040'
+  ],
+  envelopeTime: 415,
+  messageTime: 451,
+  messageSize: 677,
+  response: '250 13bc65a7-ad3a-4eca-a725-8d0502776c51',
+  envelope: { from: 'onboarding@resend.dev', to: [ 'luizics@outlook.com' ] },
+  messageId: '<a980370a-87cc-d7b2-d247-22b5638094c5@resend.dev>'
+}
