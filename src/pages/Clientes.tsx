@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Card, Button } from '../components/ui/Base';
 import {
-  Search, Users, FileText, ChevronDown, Download,
-  Mail, Smartphone, Clock, AlertCircle, CheckCircle2,
+  Search, Users, Mail, Smartphone, Clock, AlertCircle, CheckCircle2,
   X, Eye, Edit3, Save
 } from 'lucide-react';
 import { formatCurrency, formatDate, cn } from '../utils/utils';

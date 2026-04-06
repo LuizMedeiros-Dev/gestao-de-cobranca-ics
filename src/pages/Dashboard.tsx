@@ -37,13 +37,17 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [syncing, setSyncing] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
-  const [startDate, setStartDate] = useState('2026-02-10');
-  const [endDate, setEndDate] = useState('2026-03-12');
+  const [startDate, setStartDate] = useState(() => {
+    const d = new Date();
+    d.setDate(d.getDate() - 30);
+    return d.toISOString().split('T')[0];
+  });
+  const [endDate, setEndDate] = useState(() => new Date().toISOString().split('T')[0]);
 
-  const fetchStats = () => {
+  const fetchStats = (s?: string, e?: string) => {
     setLoading(true);
     Promise.all([
-      dashboardService.getStats({ startDate, endDate }),
+      dashboardService.getStats({ startDate: s || startDate, endDate: e || endDate }),
       dashboardService.getProjecao(),
     ])
       .then(([statsRes, projecaoRes]) => {
@@ -109,10 +113,16 @@ export default function Dashboard() {
                     Aplicar Filtro
                   </Button>
                   <Button variant="outline" className="w-full text-xs h-9" onClick={() => {
-                    setStartDate('2026-02-10');
-                    setEndDate('2026-03-12');
+                    const end = new Date();
+                    const start = new Date();
+                    start.setDate(end.getDate() - 30);
+                    const sStr = start.toISOString().split('T')[0];
+                    const eStr = end.toISOString().split('T')[0];
+                    
+                    setStartDate(sStr);
+                    setEndDate(eStr);
                     setShowDatePicker(false);
-                    fetchStats();
+                    fetchStats(sStr, eStr);
                     toast.info('Filtros limpos');
                   }}>
                     Limpar Filtro

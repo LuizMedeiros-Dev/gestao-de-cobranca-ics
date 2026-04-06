@@ -1,0 +1,43 @@
+{
+  "boleto": {
+    "cGerado": "N",
+    "cNumBancario": "",
+    "cNumBoleto": "",
+    "dDtEmBol": "",
+    "nPerJuros": 0,
+    "nPerMulta": 0
+  },
+  "categorias": [
+    {
+      "codigo_categoria": "1.01.02",
+      "percentual": 100,
+      "valor": 4480.28
+    }
+  ],
+  "codigo_categoria": "1.01.02",
+  "codigo_cliente_fornecedor": 11082989717,
+  "codigo_lancamento_integracao": "",
+  "codigo_lancamento_omie": 11082989737,
+  "codigo_tipo_documento": "99999",
+  "data_emissao": "28/02/2026",
+  "data_previsao": "28/02/2026",
+  "data_registro": "28/02/2026",
+  "data_vencimento": "28/02/2026",
+  "distribuicao": [],
+  "id_conta_corrente": 11082989696,
+  "id_origem": "XMLR",
+  "info": {
+    "cImpAPI": "N",
+    "dAlt": "01/04/2026",
+    "dInc": "01/04/2026",
+    "hAlt": "11:58:12",
+    "hInc": "11:58:12",
+    "uAlt": "P001413195",
+    "uInc": "P001413195"
+  },
+  "numero_documento": "7163",
+  "numero_parcela": "001/006",
+  "status_titulo": "ATRASADO",
+  "tipo_agrupamento": "I",
+  "valor_documento": 4480.28
+}

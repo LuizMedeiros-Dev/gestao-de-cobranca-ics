@@ -1,0 +1,47 @@
+{
+  "bloqueado": "N",
+  "bloquear_baixa": "N",
+  "bloquear_exclusao": "N",
+  "boleto": {
+    "cGerado": "",
+    "cNumBancario": "",
+    "cNumBoleto": "",
+    "dDtEmBol": "",
+    "nPerJuros": 0,
+    "nPerMulta": 0
+  },
+  "categorias": [
+    {
+      "codigo_categoria": "1.01.02",
+      "percentual": 100,
+      "valor": 5000
+    }
+  ],
+  "codigo_categoria": "1.01.02",
+  "codigo_cliente_fornecedor": 11082991361,
+  "codigo_lancamento_integracao": "",
+  "codigo_lancamento_omie": 11082991373,
+  "codigo_tipo_documento": "99999",
+  "data_emissao": "01/04/2026",
+  "data_previsao": "01/04/2026",
+  "data_registro": "01/04/2026",
+  "data_vencimento": "01/04/2026",
+  "distribuicao": [],
+  "id_conta_corrente": 11082989695,
+  "id_origem": "MANR",
+  "info": {
+    "cImpAPI": "N",
+    "dAlt": "06/04/2026",
+    "dInc": "01/04/2026",
+    "hAlt": "10:34:06",
+    "hInc": "12:05:11",
+    "uAlt": "P001413195",
+    "uInc": "P001413195"
+  },
+  "numero_documento": "4500",
+  "numero_documento_fiscal": "544",
+  "numero_parcela": "001/001",
+  "status_titulo": "RECEBIDO",
+  "tipo_agrupamento": "I",
+  "valor_documento": 5000
+}

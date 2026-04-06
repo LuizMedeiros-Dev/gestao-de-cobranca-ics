@@ -12,22 +12,18 @@ import {
   Plus,
   Smartphone,
   Mail,
-  Calendar,
   AlertCircle,
   ChevronDown,
   ChevronUp,
   ChevronsUpDown,
-  RefreshCw,
   Edit,
   Trash2,
-  CheckCircle2,
-  Send,
-  FileText
+  Send
 } from 'lucide-react';
 import { formatCurrency, formatDate, cn } from '../utils/utils';
 import { toast } from 'sonner';
 import { useLocation, Link } from 'wouter';
-import { titulosService, cobrancaManualService, relatorioService } from '../services/api';
+import { titulosService, cobrancaManualService } from '../services/api';
 import { motion, AnimatePresence } from 'motion/react';
 import { useEmpresa } from '../contexts/EmpresaContext';
 
@@ -111,7 +107,8 @@ export default function Titulos() {
     }
   };
 
-  const getSortedTitulos = () => {
+  // Otimização: Memoization da ordenação para evitar recálculos desnecessários a cada renderização da tabela
+  const sortedTitulos = React.useMemo(() => {
     if (!sortField || !sortOrder) return titulos;
     return [...titulos].sort((a, b) => {
       if (sortField === 'vencimento') {
@@ -124,7 +121,7 @@ export default function Titulos() {
         return sortOrder === 'asc' ? valA - valB : valB - valA;
       }
     });
-  };
+  }, [titulos, sortField, sortOrder]);
 
   useEffect(() => {
     fetchTitulos();
@@ -429,7 +426,7 @@ export default function Titulos() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
-                {getSortedTitulos().map((titulo, index, array) => {
+                {sortedTitulos.map((titulo, index, array) => {
                   const isBottom = index >= array.length - 4 && array.length > 4;
                   return (
                   <tr key={titulo.id} className="hover:bg-slate-50 dark:bg-[#121826] transition-colors group">

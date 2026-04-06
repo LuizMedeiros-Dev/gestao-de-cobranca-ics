@@ -1,8 +1,0 @@
-Error: PdfPrinter2 is not a constructor
-TypeError: PdfPrinter2 is not a constructor
-    at <anonymous> (C:\Users\luizi\OneDrive\Documentos\ics---gestão-de-recebíveis (2)\backend\services\pdfService.ts:278:25)
-    at new Promise (<anonymous>)
-    at Object._gerarBuffer (C:\Users\luizi\OneDrive\Documentos\ics---gestão-de-recebíveis (2)\backend\services\pdfService.ts:259:12)
-    at Object.gerarRelatorioTitulos (C:\Users\luizi\OneDrive\Documentos\ics---gestão-de-recebíveis (2)\backend\services\pdfService.ts:132:17)
-    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
-    at async run (C:\Users\luizi\OneDrive\Documentos\ics---gestão-de-recebíveis (2)\testPdf.ts:6:20)

@@ -2,6 +2,38 @@ import { createOmieClient } from '../integrations/omieClient.ts';
 import { getEmpresaConfig, EMPRESA_IDS } from '../config/empresas.ts';
 import { query } from '../config/database.ts';
 
+
+function normalizeDate(d: string | null): string | null {
+  if (!d) return null;
+  // Se já estiver no formato ISO YYYY-MM-DD
+  if (/^\d{4}-\d{2}-\d{2}/.test(d)) return d.split('T')[0];
+  // Se estiver no formato DD/MM/YYYY
+  const parts = d.split('/');
+  if (parts.length === 3) {
+    const [day, month, year] = parts;
+    return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+  }
+  return d;
+}
+
+function mapOmieStatus(status: string): string {
+  if (!status) return 'ABERTO';
+  const s = status.toUpperCase();
+  if (s === 'LIQUIDADO' || s === 'RECEBIDO') return 'PAGO';
+  if (s === 'CANCELADO' || s === 'EXCLUIDO') return 'CANCELADO';
+  return s;
+}
+
+function extractPaymentDate(titulo: any): string | null {
+  const status = (titulo.status_titulo || '').toUpperCase();
+  if (status !== 'RECEBIDO' && status !== 'LIQUIDADO' && status !== 'PAGO') {
+    return null;
+  }
+  // Tenta várias fontes comuns de data de pagamento no Omie
+  const date = titulo.data_pagamento || titulo.data_liquidacao || titulo.baixa_resumo?.data_liquidacao || titulo.info?.dAlt || null;
+  return normalizeDate(date);
+}
+
 export const omieSyncService = {
   async createTables() {
     // Adiciona coluna empresa_id se ainda não existir
@@ -230,22 +262,26 @@ export const omieSyncService = {
 
         for (const titulo of data.conta_receber_cadastro || []) {
           await query(
-            `INSERT INTO titulos (empresa_id, codigo_omie, codigo_cliente_omie, numero_documento, data_vencimento, valor_documento, status_titulo)
-             VALUES ($1, $2, $3, $4, $5, $6, $7)
+            `INSERT INTO titulos (empresa_id, codigo_omie, codigo_cliente_omie, numero_documento, data_vencimento, valor_documento, status_titulo, data_emissao, data_pagamento)
+             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
              ON CONFLICT (empresa_id, codigo_omie) DO UPDATE SET
                codigo_cliente_omie = EXCLUDED.codigo_cliente_omie,
                numero_documento = EXCLUDED.numero_documento,
                data_vencimento = EXCLUDED.data_vencimento,
                valor_documento = EXCLUDED.valor_documento,
-               status_titulo = EXCLUDED.status_titulo`,
+               status_titulo = EXCLUDED.status_titulo,
+               data_emissao = EXCLUDED.data_emissao,
+               data_pagamento = EXCLUDED.data_pagamento`,
             [
               empresaId,
               titulo.codigo_lancamento_omie,
               titulo.codigo_cliente_fornecedor,
               titulo.numero_documento,
-              titulo.data_vencimento,
+              normalizeDate(titulo.data_vencimento),
               titulo.valor_documento,
-              titulo.status_titulo,
+              mapOmieStatus(titulo.status_titulo),
+              normalizeDate(titulo.data_emissao),
+              extractPaymentDate(titulo),
             ]
           );
         }
@@ -264,6 +300,9 @@ export const omieSyncService = {
     await this.createTables();
     await this.syncClientes(empresaId);
     await this.syncTitulos(empresaId);
+
+    // Corrige títulos antigos com status 'LIQUIDADO'
+    await query("UPDATE titulos SET status_titulo = 'PAGO' WHERE UPPER(status_titulo) = 'LIQUIDADO'");
   },
 
   /**

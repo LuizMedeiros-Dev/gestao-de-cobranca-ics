@@ -1,3 +1,0 @@
-[dotenv@17.3.1] injecting env (16) from .env -- tip: 🤖 agentic secret storage: https://dotenvx.com/as2
-Iniciando teste de envio de e-mail via Outlook...
-Erro na conexão com SMTP: Invalid login: 535 5.7.139 Authentication unsuccessful, basic authentication is disabled. [CP5P284CA0229.BRAP284.PROD.OUTLOOK.COM 2026-04-01T12:43:40.770Z 08DE8F9856F44DF8]

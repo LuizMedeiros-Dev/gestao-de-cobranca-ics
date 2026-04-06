@@ -51,7 +51,7 @@ function wrapHtmlProfissional(conteudo: string, subject: string, variaveis?: any
                 </tr>
                 <tr>
                   <td style="padding: 8px 0; border-bottom: 1px solid #e2e8f0;"><strong>Serviço:</strong></td>
-                  <td style="padding: 8px 0; border-bottom: 1px solid #e2e8f0; text-align: right;">Assinatura mensal</td>
+                  <td style="padding: 8px 0; border-bottom: 1px solid #e2e8f0; text-align: right;">Contrato</td>
                 </tr>
                 <tr>
                   <td style="padding: 8px 0; border-bottom: 1px solid #e2e8f0;"><strong>Valor:</strong></td>
@@ -71,7 +71,7 @@ function wrapHtmlProfissional(conteudo: string, subject: string, variaveis?: any
         </tr>
         <tr>
           <td align="center" style="padding-top: 32px;">
-            <a href="#" style="display: inline-block; background-color: #ff6b6b; color: #ffffff; padding: 14px 40px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 16px;">PAGAR AGORA</a>
+            <a href="https://wa.me/5562998560045?text=Ol%C3%A1!%20Gostaria%20do%20link/boleto%20para%20pagamento%20do(s)%20meu(s)%20t%C3%ADtulo(s)%20em%20aberto." style="display: inline-block; background-color: #ff6b6b; color: #ffffff; padding: 14px 40px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 16px;">PAGAR AGORA</a>
           </td>
         </tr>
         <tr>
@@ -128,7 +128,7 @@ function wrapHtmlProfissional(conteudo: string, subject: string, variaveis?: any
       <div class="support-box">
         <h3>Precisa de ajuda? Estamos à disposição!</h3>
         <p>Entre em contato conosco caso tenha qualquer dúvida ou necessite de suporte.</p>
-        <a href="mailto:contato@ics30.com.br" class="support-btn">✉ Falar com o Suporte</a>
+        <a href="mailto:financeiro@icsgo.com.br" class="support-btn">✉ Falar com o Suporte</a>
       </div>
 
       <div class="footer">

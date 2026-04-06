@@ -1,3 +1,0 @@
-[dotenv@17.3.1] injecting env (16) from .env -- tip: ⚙️  specify custom .env file path with { path: '/custom/path/.env' }
-Iniciando teste de envio de e-mail via Outlook...
-Erro na conexão com SMTP: Invalid login: 535 5.7.139 Authentication unsuccessful, SmtpClientAuthentication is disabled for the Tenant. Visit https://aka.ms/smtp_auth_disabled for more information. [CP3P284CA0078.BRAP284.PROD.OUTLOOK.COM 2026-04-01T12:36:46.189Z 08DE8F96F4E5CFFC]

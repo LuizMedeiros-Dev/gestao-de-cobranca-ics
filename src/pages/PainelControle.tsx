@@ -24,21 +24,29 @@ export default function PainelControle() {
   const [syncing, setSyncing] = useState(false);
   const [executandoRegras, setExecutandoRegras] = useState(false);
   const [provedores, setProvedores] = useState<any>(null);
+  const [loadingProvedores, setLoadingProvedores] = useState(true);
 
   const fetchPanelData = () => {
     setLoading(true);
-    Promise.all([
-      titulosService.getPanelData(),
-      cobrancaManualService.statusProvedores(),
-    ])
-      .then(([panelRes, provRes]) => {
-        setData(panelRes.data);
-        setProvedores(provRes.data);
+    titulosService.getPanelData()
+      .then(res => {
+        setData(res.data);
         setLoading(false);
       })
       .catch(err => {
         console.error(err);
         setLoading(false);
+      });
+
+    setLoadingProvedores(true);
+    cobrancaManualService.statusProvedores()
+      .then(res => {
+        setProvedores(res.data);
+        setLoadingProvedores(false);
+      })
+      .catch(err => {
+        console.error(err);
+        setLoadingProvedores(false);
       });
   };
 
@@ -143,68 +151,77 @@ export default function PainelControle() {
       </div>
 
       {/* Provider Status */}
-      {provedores && (
-        <Card className="overflow-hidden">
-          <div className="p-6 border-b border-slate-100 dark:border-[#2A364A]">
-            <h3 className="font-bold text-slate-900 dark:text-white flex items-center gap-2">
-              <Wifi className="w-4 h-4 text-emerald-600" /> Status dos Provedores
-            </h3>
-          </div>
-          <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* Email Provider */}
-            <div className={`p-5 rounded-xl border flex items-center gap-4 ${provedores.email?.ok
-                ? 'border-emerald-100 dark:border-emerald-800/40 bg-emerald-50 dark:bg-emerald-900/20'
-                : 'border-red-100 dark:border-red-800/40 bg-red-50 dark:bg-red-900/20'
-              }`}>
-              <div className={`p-3 rounded-xl ${provedores.email?.ok ? 'bg-emerald-100 text-emerald-600' : 'bg-red-100 text-red-600'}`}>
-                <Mail className="w-5 h-5" />
-              </div>
-              <div className="flex-1">
-                <p className="text-sm font-bold text-slate-900 dark:text-white">E-mail (SMTP)</p>
-                <div className="flex items-center gap-1.5 mt-1">
-                  {provedores.email?.ok ? (
-                    <>
-                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                      <span className="text-xs text-emerald-600 font-medium">Conectado</span>
-                    </>
-                  ) : (
-                    <>
-                      <AlertCircle className="w-3.5 h-3.5 text-red-600" />
-                      <span className="text-xs text-red-600 font-medium">{provedores.email?.motivo || 'Desconectado'}</span>
-                    </>
-                  )}
+      <Card className="overflow-hidden">
+        <div className="p-6 border-b border-slate-100 dark:border-[#2A364A]">
+          <h3 className="font-bold text-slate-900 dark:text-white flex items-center gap-2">
+            <Wifi className="w-4 h-4 text-emerald-600" /> Status dos Provedores
+          </h3>
+        </div>
+        <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+          {loadingProvedores ? (
+            <>
+              <div className="p-5 rounded-xl border border-slate-100 dark:border-slate-800 animate-pulse bg-slate-50/50 dark:bg-slate-900/20 h-24"></div>
+              <div className="p-5 rounded-xl border border-slate-100 dark:border-slate-800 animate-pulse bg-slate-50/50 dark:bg-slate-900/20 h-24"></div>
+            </>
+          ) : provedores ? (
+            <>
+              {/* Email Provider */}
+              <div className={`p-5 rounded-xl border flex items-center gap-4 ${provedores.email?.ok
+                  ? 'border-emerald-100 dark:border-emerald-800/40 bg-emerald-50 dark:bg-emerald-900/20'
+                  : 'border-red-100 dark:border-red-800/40 bg-red-50 dark:bg-red-900/20'
+                }`}>
+                <div className={`p-3 rounded-xl ${provedores.email?.ok ? 'bg-emerald-100 text-emerald-600' : 'bg-red-100 text-red-600'}`}>
+                  <Mail className="w-5 h-5" />
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-bold text-slate-900 dark:text-white">E-mail (SMTP)</p>
+                  <div className="flex items-center gap-1.5 mt-1">
+                    {provedores.email?.ok ? (
+                      <>
+                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                        <span className="text-xs text-emerald-600 font-medium">Conectado</span>
+                      </>
+                    ) : (
+                      <>
+                        <AlertCircle className="w-3.5 h-3.5 text-red-600" />
+                        <span className="text-xs text-red-600 font-medium">{provedores.email?.motivo || 'Desconectado'}</span>
+                      </>
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
 
-            {/* WhatsApp Provider */}
-            <div className={`p-5 rounded-xl border flex items-center gap-4 ${provedores.whatsapp?.ok
-                ? 'border-emerald-100 dark:border-emerald-800/40 bg-emerald-50 dark:bg-emerald-900/20'
-                : 'border-red-100 dark:border-red-800/40 bg-red-50 dark:bg-red-900/20'
-              }`}>
-              <div className={`p-3 rounded-xl ${provedores.whatsapp?.ok ? 'bg-emerald-100 text-emerald-600' : 'bg-red-100 text-red-600'}`}>
-                <MessageCircle className="w-5 h-5" />
-              </div>
-              <div className="flex-1">
-                <p className="text-sm font-bold text-slate-900 dark:text-white">WhatsApp (Evolution API)</p>
-                <div className="flex items-center gap-1.5 mt-1">
-                  {provedores.whatsapp?.ok ? (
-                    <>
-                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                      <span className="text-xs text-emerald-600 font-medium">Conectado — {provedores.whatsapp?.estado}</span>
-                    </>
-                  ) : (
-                    <>
-                      <AlertCircle className="w-3.5 h-3.5 text-red-600" />
-                      <span className="text-xs text-red-600 font-medium">{provedores.whatsapp?.motivo || 'Desconectado'}</span>
-                    </>
-                  )}
+              {/* WhatsApp Provider */}
+              <div className={`p-5 rounded-xl border flex items-center gap-4 ${provedores.whatsapp?.ok
+                  ? 'border-emerald-100 dark:border-emerald-800/40 bg-emerald-50 dark:bg-emerald-900/20'
+                  : 'border-red-100 dark:border-red-800/40 bg-red-50 dark:bg-red-900/20'
+                }`}>
+                <div className={`p-3 rounded-xl ${provedores.whatsapp?.ok ? 'bg-emerald-100 text-emerald-600' : 'bg-red-100 text-red-600'}`}>
+                  <MessageCircle className="w-5 h-5" />
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-bold text-slate-900 dark:text-white">WhatsApp (Evolution API)</p>
+                  <div className="flex items-center gap-1.5 mt-1">
+                    {provedores.whatsapp?.ok ? (
+                      <>
+                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                        <span className="text-xs text-emerald-600 font-medium">Conectado — {provedores.whatsapp?.estado}</span>
+                      </>
+                    ) : (
+                      <>
+                        <AlertCircle className="w-3.5 h-3.5 text-red-600" />
+                        <span className="text-xs text-red-600 font-medium">{provedores.whatsapp?.motivo || 'Desconectado'}</span>
+                      </>
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
-          </div>
-        </Card>
-      )}
+            </>
+          ) : (
+            <div className="col-span-2 text-center text-red-500 text-sm p-4">Erro ao verificar provedores</div>
+          )}
+        </div>
+      </Card>
 
       {/* Metrics Grid */}
       <Card className="overflow-hidden">
