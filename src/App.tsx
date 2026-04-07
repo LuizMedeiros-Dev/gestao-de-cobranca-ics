@@ -4,10 +4,11 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { Route, Switch, useLocation } from 'wouter';
+import { Route, Switch, useLocation, Redirect } from 'wouter';
 import { DashboardLayout } from './layout/DashboardLayout';
 import { EmpresaProvider } from './contexts/EmpresaContext';
 import { ThemeProvider } from './contexts/ThemeContext';
+import { titulosService } from './services/api';
 
 // Pages
 import Dashboard from './pages/Dashboard';
@@ -23,12 +24,26 @@ import Login from './pages/Login';
 
 export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+  const [user, setUser] = useState<any>(null);
   const [, setLocation] = useLocation();
 
   useEffect(() => {
     const auth = localStorage.getItem('isAuthenticated');
     setIsAuthenticated(auth === 'true');
   }, []);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      titulosService.getUser().then(res => {
+        setUser(res.data);
+      }).catch(err => {
+        if (err.response?.status === 401) {
+          setIsAuthenticated(false);
+          localStorage.removeItem('isAuthenticated');
+        }
+      });
+    }
+  }, [isAuthenticated]);
 
   const handleLogin = (success: boolean) => {
     if (success) {
@@ -56,7 +71,13 @@ export default function App() {
             <Route path="/regras" component={RegrasCobranca} />
             <Route path="/templates" component={TemplatesMensagem} />
             <Route path="/painel" component={PainelControle} />
-            <Route path="/configuracoes" component={Configuracoes} />
+            <Route path="/configuracoes">
+              {user ? (
+                user.cargo === 'Administrador' ? <Configuracoes /> : <Redirect to="/" />
+              ) : (
+                <div className="p-8 text-center text-slate-500">Verificando permissões...</div>
+              )}
+            </Route>
             <Route path="/clientes" component={Clientes} />
             
             {/* Fallback route */}

@@ -20,7 +20,10 @@ export default function Login({ onLogin }: LoginProps) {
     setError('');
 
     authService.login({ username, password })
-      .then(() => {
+      .then((res) => {
+        const { token, user } = res.data;
+        localStorage.setItem('token', token);
+        localStorage.setItem('user', JSON.stringify(user));
         localStorage.setItem('isAuthenticated', 'true');
         onLogin(true);
       })
@@ -59,7 +62,7 @@ export default function Login({ onLogin }: LoginProps) {
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   className="w-full bg-slate-50 dark:bg-[#121826] border border-slate-200 dark:border-[#2A364A] rounded-xl pl-10 pr-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all"
-                  placeholder="admin"
+                  placeholder="CPF/E-mail"
                   required
                 />
               </div>

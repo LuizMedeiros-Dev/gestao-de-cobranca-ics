@@ -4,9 +4,14 @@ const api = axios.create({
   baseURL: '/api'
 });
 
-// Interceptor: injeta X-Empresa-Id em toda requisição
+// Interceptor: injeta Token e X-Empresa-Id em toda requisição
 api.interceptors.request.use((config) => {
   try {
+    const token = localStorage.getItem('token');
+    if (token) {
+      config.headers['Authorization'] = `Bearer ${token}`;
+    }
+
     const saved = localStorage.getItem('empresa_selecionada');
     if (saved) {
       const empresa = JSON.parse(saved);
@@ -17,6 +22,23 @@ api.interceptors.request.use((config) => {
   } catch { }
   return config;
 });
+
+// Interceptor: lida com erros de autenticação (401)
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      const isLoginRequest = error.config?.url?.includes('/login');
+      if (!isLoginRequest) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('isAuthenticated');
+        localStorage.removeItem('user');
+        window.location.href = '/'; // Redireciona para login
+      }
+    }
+    return Promise.reject(error);
+  }
+);
 
 export const dashboardService = {
   getStats: (params?: { startDate?: string; endDate?: string }) => api.get('/dashboard', { params }),
@@ -78,6 +100,9 @@ export const omieService = {
 export const authService = {
   login: (data: any) => api.post('/login', data),
   createUser: (data: any) => api.post('/users', data),
+  listUsers: (params?: any) => api.get('/users-list', { params }),
+  updateUserAdmin: (id: string, data: any) => api.put(`/users/${id}`, data),
+  resetPassword: (id: string) => api.post(`/users/${id}/reset-password`),
 };
 
 export const clientesService = {

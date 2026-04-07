@@ -7,6 +7,7 @@ import { dashboardController } from '../controllers/dashboardController.ts';
 import { titulosController } from '../controllers/titulosController.ts';
 import { settingsController } from '../controllers/settingsController.ts';
 import { cobrancaController } from '../controllers/cobrancaController.ts';
+import { authMiddleware } from '../middlewares/authMiddleware.ts';
 
 const router = Router();
 
@@ -17,8 +18,15 @@ router.use((req: Request, res: Response, next: NextFunction) => {
   next();
 });
 
-// ──────────────── SYSTEM & SETTINGS ────────────────
+// ──────────────── SYSTEM & SETTINGS (Public) ────────────────
 router.get('/health', settingsController.getHealth);
+router.post('/login', settingsController.login);
+// A partir daqui, todas as rotas exigem autenticação
+router.use(authMiddleware);
+
+router.post('/users', settingsController.createUser);
+
+// ──────────────── SYSTEM & SETTINGS (Protected) ────────────────
 router.get('/provedores/status', settingsController.getProvedoresStatus);
 router.get('/config', settingsController.getConfig);
 router.post('/config', settingsController.updateConfig);
@@ -65,7 +73,9 @@ router.post('/cobranca/executar', cobrancaController.executarRegras);
 router.get('/user', settingsController.getUser);
 router.put('/user', settingsController.updateUser);
 router.post('/user/change-password', settingsController.changePassword);
-router.post('/login', settingsController.login);
-router.post('/users', settingsController.createUser);
+
+router.get('/users-list', settingsController.listUsers);
+router.put('/users/:id', settingsController.updateUserByAdmin);
+router.post('/users/:id/reset-password', settingsController.resetUserPassword);
 
 export default router;

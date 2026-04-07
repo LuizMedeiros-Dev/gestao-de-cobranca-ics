@@ -8,10 +8,11 @@ interface ModalProps {
   onClose: () => void;
   title: string;
   children: React.ReactNode;
+  headerAction?: React.ReactNode;
   size?: 'sm' | 'md' | 'lg' | 'xl';
 }
 
-export function Modal({ isOpen, onClose, title, children, size = 'md' }: ModalProps) {
+export function Modal({ isOpen, onClose, title, children, headerAction, size = 'md' }: ModalProps) {
   const sizes = {
     sm: 'max-w-md',
     md: 'max-w-2xl',
@@ -41,12 +42,15 @@ export function Modal({ isOpen, onClose, title, children, size = 'md' }: ModalPr
           >
             <div className="px-6 py-4 border-b border-slate-100 dark:border-[#2A364A] flex items-center justify-between shrink-0">
               <h3 className="text-lg font-bold text-slate-900 dark:text-white">{title}</h3>
-              <button 
-                onClick={onClose}
-                className="p-2 hover:bg-slate-100 rounded-lg transition-colors text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:text-slate-300"
-              >
-                <X className="w-5 h-5" />
-              </button>
+              <div className="flex items-center gap-2">
+                {headerAction}
+                <button 
+                  onClick={onClose}
+                  className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:text-slate-300"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
             </div>
             <div className="p-6 overflow-y-auto">
               {children}

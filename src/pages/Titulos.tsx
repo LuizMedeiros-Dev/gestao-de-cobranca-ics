@@ -109,6 +109,7 @@ export default function Titulos() {
 
   // Otimização: Memoization da ordenação para evitar recálculos desnecessários a cada renderização da tabela
   const sortedTitulos = React.useMemo(() => {
+    if (!Array.isArray(titulos)) return [];
     if (!sortField || !sortOrder) return titulos;
     return [...titulos].sort((a, b) => {
       if (sortField === 'vencimento') {
@@ -125,7 +126,14 @@ export default function Titulos() {
 
   useEffect(() => {
     fetchTitulos();
-    fetch('/api/templates').then(res => res.json()).then(setTemplates);
+    titulosService.getTemplates()
+      .then(res => {
+        setTemplates(Array.isArray(res.data) ? res.data : []);
+      })
+      .catch(err => {
+        console.error('Erro ao buscar templates:', err);
+        setTemplates([]);
+      });
   }, [selectedStatuses, searchTerm, empresa.id]);
 
   const fetchAcordos = (tituloId: number) => {
@@ -588,7 +596,7 @@ export default function Titulos() {
               }}
             >
               <option value="">Selecione um template...</option>
-              {templates.filter(t => (t.tipo || t.canal) === cobrarCanal).map(t => (
+              {Array.isArray(templates) && templates.filter(t => (t.tipo || t.canal) === cobrarCanal).map(t => (
                 <option key={t.id} value={t.id}>{t.nome}</option>
               ))}
             </select>
@@ -873,7 +881,7 @@ export default function Titulos() {
                         }}
                       >
                         <option value="">Selecione um template...</option>
-                        {templates.filter(t => t.tipo === 'email').map(t => (
+                        {Array.isArray(templates) && templates.filter(t => t.tipo === 'email').map(t => (
                           <option key={t.id} value={t.id}>{t.nome}</option>
                         ))}
                       </select>
@@ -903,7 +911,7 @@ export default function Titulos() {
                         }}
                       >
                         <option value="">Selecione um template...</option>
-                        {templates.filter(t => t.tipo === 'whatsapp').map(t => (
+                        {Array.isArray(templates) && templates.filter(t => t.tipo === 'whatsapp').map(t => (
                           <option key={t.id} value={t.id}>{t.nome}</option>
                         ))}
                       </select>

@@ -1,11 +1,32 @@
 import { Request, Response } from 'express';
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
 import { query } from '../config/database.ts';
+import dotenv from 'dotenv';
+dotenv.config();
+
+const JWT_SECRET = process.env.JWT_SECRET || 'ics_segredo_padrao_mudar_em_producao';
 
 /**
  * Cache temporário para o status dos provedores para evitar requisições frequentes.
  */
 let providerStatusCache: { data: any; lastUpdate: number } | null = null;
 const CACHE_TTL = 30000; // 30 segundos
+
+/**
+ * Valida se a senha atende aos requisitos de segurança:
+ * - Pelo menos 8 caracteres
+ * - Pelo menos uma letra maiúscula
+ * - Pelo menos um número
+ * - Pelo menos um caractere especial (!@#$%^&*()_+-=[]{}|;:,.<>?)
+ */
+function isStrongPassword(password: string): boolean {
+  const hasMinLength = password.length >= 8;
+  const hasUpperCase = /[A-Z]/.test(password);
+  const hasNumber = /[0-9]/.test(password);
+  const hasSpecial = /[!@#$%^&*()_+\-=\[\]{}|;:,.<>?]/.test(password);
+  return hasMinLength && hasUpperCase && hasNumber && hasSpecial;
+}
 
 /**
  * Controller responsavel pelas configurações gerais de negocio (Regras, Templates, Usario, Sistema)
@@ -158,17 +179,22 @@ export const settingsController = {
 
   // ──────────────── USERS ────────────────
   async getUser(req: Request, res: Response) {
+    const userId = res.locals.userId;
     try {
-      const result = await query('SELECT * FROM users LIMIT 1');
+      const result = await query('SELECT id, nome, email, cpf, cargo, foto_url FROM users WHERE id = $1', [userId]);
+      if (result.rows.length === 0) {
+        return res.status(404).json({ error: 'Usuário não encontrado' });
+      }
       res.json(result.rows[0]);
     } catch (error: any) {
       res.status(500).json({ error: error.message });
     }
   },
   async updateUser(req: Request, res: Response) {
+    const userId = res.locals.userId;
     const { nome, email } = req.body;
     try {
-      await query('UPDATE users SET nome = $1, email = $2 WHERE id = (SELECT id FROM users LIMIT 1)', [nome, email]);
+      await query('UPDATE users SET nome = $1, email = $2 WHERE id = $3', [nome, email, userId]);
       res.json({ success: true });
     } catch (error: any) {
       res.status(500).json({ error: error.message });
@@ -176,40 +202,149 @@ export const settingsController = {
   },
   async changePassword(req: Request, res: Response) {
     const { currentPassword, newPassword } = req.body;
+    const userId = res.locals.userId;
     try {
-      const result = await query('SELECT password FROM users LIMIT 1');
+      const result = await query('SELECT password FROM users WHERE id = $1', [userId]);
       const user = result.rows[0];
-      if (user.password && user.password !== currentPassword) {
+      
+      if (!user) {
+        return res.status(404).json({ error: 'Usuário não encontrado' });
+      }
+
+      const isMatch = await bcrypt.compare(currentPassword, user.password);
+      if (!isMatch) {
         return res.status(400).json({ error: 'Senha atual incorreta' });
       }
-      await query('UPDATE users SET password = $1 WHERE id = (SELECT id FROM users LIMIT 1)', [newPassword]);
+
+      if (!isStrongPassword(newPassword)) {
+        return res.status(400).json({ 
+          error: 'A nova senha deve ter no mínimo 8 caracteres, uma letra maiúscula, um número e um caractere especial.' 
+        });
+      }
+
+      const hashedPassword = await bcrypt.hash(newPassword, 10);
+      await query('UPDATE users SET password = $1 WHERE id = $2', [hashedPassword, userId]);
       res.json({ success: true });
     } catch (error: any) {
       res.status(500).json({ error: error.message });
     }
   },
+
   async login(req: Request, res: Response) {
     const { username, password } = req.body;
     try {
-      const result = await query('SELECT * FROM users WHERE (email = $1 OR cpf = $1 OR nome = $1) AND password = $2', [username, password]);
-      if (result.rows.length > 0) {
-        res.json({ success: true, user: result.rows[0] });
-      } else {
-        res.status(401).json({ error: 'Credenciais inválidas' });
+      // Login restrito a Email ou CPF para evitar ambiguidades com nomes duplicados
+      const result = await query('SELECT * FROM users WHERE email = $1 OR cpf = $1', [username]);
+      
+      if (result.rows.length === 0) {
+        return res.status(401).json({ error: 'Usuário não encontrado.' });
       }
+
+      const user = result.rows[0];
+      const isMatch = await bcrypt.compare(password, user.password);
+
+      if (!isMatch) {
+        return res.status(401).json({ error: 'Senha Incorreta.' });
+      }
+
+      // Gera JWT Token
+      const token = jwt.sign(
+        { id: user.id, email: user.email, cargo: user.cargo },
+        JWT_SECRET,
+        { expiresIn: '8h' }
+      );
+
+      // Remove password da resposta por segurança
+      delete user.password;
+
+      res.json({ success: true, token, user });
     } catch (error: any) {
       res.status(500).json({ error: error.message });
     }
   },
+
   async createUser(req: Request, res: Response) {
-    const { nome, cpf, email, password } = req.body;
+    if (res.locals.userCargo !== 'Administrador') {
+      // Se não houver usuários no banco, permite criar o primeiro admin
+      const checkResult = await query('SELECT count(*) FROM users');
+      if (parseInt(checkResult.rows[0].count) > 0) {
+        return res.status(403).json({ error: 'Acesso negado. Apenas administradores podem criar novos usuários.' });
+      }
+    }
+    const { nome, cpf, email, password, cargo } = req.body;
     try {
+      if (!isStrongPassword(password)) {
+        return res.status(400).json({ 
+          error: 'A senha deve ter no mínimo 8 caracteres, uma letra maiúscula, um número e um caractere especial.' 
+        });
+      }
+      const hashedPassword = await bcrypt.hash(password, 10);
       await query(`
         INSERT INTO users (nome, email, cpf, password, cargo) 
-        VALUES ($1, $2, $3, $4, 'Administrador')
-        ON CONFLICT (email) DO UPDATE SET password = EXCLUDED.password, cpf = EXCLUDED.cpf, nome = EXCLUDED.nome
-      `, [nome, email, cpf, password]);
+        VALUES ($1, $2, $3, $4, $5)
+        ON CONFLICT (email) DO UPDATE SET password = EXCLUDED.password, cpf = EXCLUDED.cpf, nome = EXCLUDED.nome, cargo = EXCLUDED.cargo
+      `, [nome, email, cpf, hashedPassword, cargo || 'Usuário']);
       res.json({ success: true });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  },
+  async listUsers(req: Request, res: Response) {
+    if (res.locals.userCargo !== 'Administrador') {
+      return res.status(403).json({ error: 'Acesso negado. Apenas administradores podem listar usuários.' });
+    }
+    const { nome, email, cpf } = req.query;
+    let sql = 'SELECT id, nome, email, cpf, cargo FROM users WHERE 1=1';
+    const params: any[] = [];
+
+    if (nome) {
+      params.push(`%${nome}%`);
+      sql += ` AND nome ILIKE $${params.length}`;
+    }
+    if (email) {
+      params.push(`%${email}%`);
+      sql += ` AND email ILIKE $${params.length}`;
+    }
+    if (cpf) {
+      params.push(`%${cpf}%`);
+      sql += ` AND cpf ILIKE $${params.length}`;
+    }
+
+    sql += ' ORDER BY nome';
+    try {
+      const result = await query(sql, params);
+      res.json(result.rows);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  },
+  async updateUserByAdmin(req: Request, res: Response) {
+    if (res.locals.userCargo !== 'Administrador') {
+      return res.status(403).json({ error: 'Acesso negado. Apenas administradores podem editar outros usuários.' });
+    }
+    const { id } = req.params;
+    const { nome, email, cpf, cargo } = req.body;
+    try {
+      await query(`
+        UPDATE users 
+        SET nome = $1, email = $2, cpf = $3, cargo = $4 
+        WHERE id = $5
+      `, [nome, email, cpf, cargo, id]);
+      res.json({ success: true });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  },
+  async resetUserPassword(req: Request, res: Response) {
+    if (res.locals.userCargo !== 'Administrador') {
+      return res.status(403).json({ error: 'Acesso negado. Apenas administradores podem redefinir senhas.' });
+    }
+    const { id } = req.params;
+    try {
+      const defaultPassword = 'Acesso123@';
+      const hashedPassword = await bcrypt.hash(defaultPassword, 10);
+      await query('UPDATE users SET password = $1 WHERE id = $2', [hashedPassword, id]);
+      res.json({ success: true, message: `Senha redefinida para: ${defaultPassword}` });
     } catch (error: any) {
       res.status(500).json({ error: error.message });
     }

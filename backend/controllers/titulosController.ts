@@ -12,6 +12,10 @@ export const titulosController = {
   async getTitulos(req: Request, res: Response) {
     const { status, search } = req.query;
     const empresaId = res.locals.empresaId;
+    if (!empresaId) {
+      console.error('EmpresaId não encontrado no res.locals');
+      return res.status(400).json({ error: 'Identificação da empresa ausente' });
+    }
 
     let sql = `
       SELECT t.*, c.nome_fantasia as cliente,

@@ -8,15 +8,19 @@ import {
   Settings2, 
   MessageSquare, 
   ShieldCheck, 
-  Settings,
   LogOut,
   ChevronDown,
   Building,
-  Users
+  Users,
+  UserRoundCog,
+  UserPlus,
+  Sun,
+  Moon
 } from 'lucide-react';
 import { cn, formatCurrency } from '../utils/utils';
 import { motion, AnimatePresence } from 'motion/react';
 import { useEmpresa } from '../contexts/EmpresaContext';
+import { useTheme } from '../contexts/ThemeContext';
 import { Modal } from '../components/ui/Modal';
 import { Button } from '../components/ui/Base';
 import { titulosService } from '../services/api';
@@ -31,11 +35,12 @@ const menuItems = [
   { icon: Settings2, label: 'Regras de Cobrança', href: '/regras' },
   { icon: MessageSquare, label: 'Templates', href: '/templates' },
   { icon: ShieldCheck, label: 'Painel de Controle', href: '/painel' },
-  { icon: Settings, label: 'Configurações', href: '/configuracoes' },
+  { icon: UserRoundCog, label: 'Usuários', href: '/configuracoes' },
 ];
 
 export function Sidebar() {
   const [location] = useLocation();
+  const { theme, toggleTheme } = useTheme();
   const { empresa, setEmpresa, empresasDisponiveis } = useEmpresa();
   const [showCompanySwitcher, setShowCompanySwitcher] = useState(false);
   const [showProfileModal, setShowProfileModal] = useState(false);
@@ -66,6 +71,15 @@ export function Sidebar() {
     if (passwordForm.new !== passwordForm.confirm) {
       return toast.error('As novas senhas não coincidem');
     }
+    const hasMinLength = passwordForm.new.length >= 8;
+    const hasUpperCase = /[A-Z]/.test(passwordForm.new);
+    const hasNumber = /[0-9]/.test(passwordForm.new);
+    const hasSpecial = /[!@#$%^&*()_+\-=\[\]{}|;:,.<>?]/.test(passwordForm.new);
+
+    if (!hasMinLength || !hasUpperCase || !hasNumber || !hasSpecial) {
+      return toast.error('A senha deve ter 8+ caracteres, uma maiúscula, um número e um caractere especial.');
+    }
+
     titulosService.changePassword({ 
       currentPassword: passwordForm.current, 
       newPassword: passwordForm.new 
@@ -129,6 +143,11 @@ export function Sidebar() {
 
       <nav className="flex-1 px-4 space-y-1 mt-2">
         {menuItems.map((item) => {
+          // Oculta o menu de usuários para quem não é administrador
+          if (item.href === '/configuracoes' && user?.cargo !== 'Administrador') {
+            return null;
+          }
+
           const isActive = location === item.href;
           return (
             <Link 
@@ -181,6 +200,15 @@ export function Sidebar() {
         onClose={() => setShowProfileModal(false)}
         title="Meu Perfil"
         size="lg"
+        headerAction={
+          <button
+            onClick={toggleTheme}
+            className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:text-slate-300"
+            title={theme === 'dark' ? 'Mudar para Tema Claro' : 'Mudar para Tema Escuro'}
+          >
+            {theme === 'dark' ? <Sun className="w-5 h-5 text-amber-500" /> : <Moon className="w-5 h-5 text-indigo-600" />}
+          </button>
+        }
       >
         <div className="space-y-8">
           {/* Basic Info */}
@@ -276,6 +304,23 @@ export function Sidebar() {
                     </button>
                   </div>
                 </div>
+              </div>
+              <div className="p-3 bg-slate-50 dark:bg-[#121826] border border-slate-100 dark:border-[#2A364A] rounded-xl">
+                <p className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Requisitos da Nova Senha:</p>
+                <ul className="grid grid-cols-2 gap-x-4 gap-y-1">
+                  <li className={`text-[10px] flex items-center gap-1.5 ${passwordForm.new.length >= 8 ? 'text-emerald-600 font-bold' : 'text-slate-400'}`}>
+                    <div className={`w-1 h-1 rounded-full ${passwordForm.new.length >= 8 ? 'bg-emerald-600' : 'bg-slate-300'}`} /> Mínimo 8 caracteres
+                  </li>
+                  <li className={`text-[10px] flex items-center gap-1.5 ${/[A-Z]/.test(passwordForm.new) ? 'text-emerald-600 font-bold' : 'text-slate-400'}`}>
+                    <div className={`w-1 h-1 rounded-full ${/[A-Z]/.test(passwordForm.new) ? 'bg-emerald-600' : 'bg-slate-300'}`} /> Uma letra maiúscula
+                  </li>
+                  <li className={`text-[10px] flex items-center gap-1.5 ${/[0-9]/.test(passwordForm.new) ? 'text-emerald-600 font-bold' : 'text-slate-400'}`}>
+                    <div className={`w-1 h-1 rounded-full ${/[0-9]/.test(passwordForm.new) ? 'bg-emerald-600' : 'bg-slate-300'}`} /> Pelo menos um número
+                  </li>
+                  <li className={`text-[10px] flex items-center gap-1.5 ${/[!@#$%^&*()_+\-=\[\]{}|;:,.<>?]/.test(passwordForm.new) ? 'text-emerald-600 font-bold' : 'text-slate-400'}`}>
+                    <div className={`w-1 h-1 rounded-full ${/[!@#$%^&*()_+\-=\[\]{}|;:,.<>?]/.test(passwordForm.new) ? 'bg-emerald-600' : 'bg-slate-300'}`} /> Caractere especial
+                  </li>
+                </ul>
               </div>
             </div>
             <div className="flex justify-end">
