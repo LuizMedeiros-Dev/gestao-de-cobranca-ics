@@ -4,18 +4,18 @@ import { whatsappService } from './whatsappService.ts';
 
 function substituirVariaveis(template: string, dados: Record<string, string>) {
   return template
-    .replace(/\{cliente\}/gi, dados.cliente || '')
-    .replace(/\{valor\}/gi, dados.valor || '')
-    .replace(/\{vencimento\}/gi, dados.vencimento || '')
-    .replace(/\{nf\}/gi, dados.nf || '')
-    .replace(/\{dias_atraso\}/gi, dados.dias_atraso || '');
+    .replace(/\{cliente\}/gi, () => dados.cliente || '')
+    .replace(/\{valor\}/gi, () => dados.valor || '')
+    .replace(/\{vencimento\}/gi, () => dados.vencimento || '')
+    .replace(/\{nf\}/gi, () => dados.nf || '')
+    .replace(/\{dias_atraso\}/gi, () => dados.dias_atraso || '');
 }
 
-function formatarMoeda(valor: number) {
+export function formatarMoeda(valor: number) {
   return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(valor);
 }
 
-function formatarData(data: any) {
+export function formatarData(data: any) {
   if (!data) return '';
   if (data instanceof Date) return data.toLocaleDateString('pt-BR');
   if (typeof data === 'string') {
@@ -152,7 +152,7 @@ export const cobrancaService = {
     return { disparos: totalDisparos };
   },
 
-  async cobrarTituloManual(tituloId: number, canal: 'email' | 'whatsapp', mensagem: string) {
+  async cobrarTituloManual(tituloId: number, canal: 'email' | 'whatsapp', mensagem: string, overrides: Record<string, string> = {}) {
     const tituloResult = await query(`
       SELECT t.*, 
              COALESCE(c.nome_fantasia, c.razao_social) as nome_cliente,
@@ -173,11 +173,13 @@ export const cobrancaService = {
     );
     const variaveis = {
       cliente: titulo.nome_cliente || '',
-      valor: formatarMoeda(parseFloat(titulo.valor_documento)),
-      vencimento: formatarData(titulo.data_vencimento),
+      valor: ('valor' in overrides) ? overrides.valor : formatarMoeda(parseFloat(titulo.valor_documento)),
+      vencimento: ('vencimento' in overrides) ? overrides.vencimento : formatarData(titulo.data_vencimento),
       nf: titulo.numero_documento || '',
       dias_atraso: String(Math.max(0, diasAtraso)),
+      ...overrides,
     };
+
     const mensagemFinal = substituirVariaveis(mensagem, variaveis);
 
     let enviado = false;

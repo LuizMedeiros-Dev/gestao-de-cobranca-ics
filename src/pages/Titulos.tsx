@@ -162,7 +162,8 @@ export default function Titulos() {
     const payload = {
       ...newAcordo,
       valor_total: valorTotal,
-      valor_parcela: valorParcelaNum
+      valor_parcela: valorParcelaNum,
+      titulo_id: selectedTitulo.id
     };
 
     const action = editingAcordoId
@@ -848,7 +849,7 @@ export default function Titulos() {
                   <label className="text-sm font-bold text-slate-700 dark:text-slate-200">Valor da Parcela</label>
                   <input
                     type="text"
-                    placeholder="R$ 0,00"
+                    placeholder={selectedTitulo ? formatCurrency(selectedTitulo.valor_documento) : "R$ 0,00"}
                     className="w-full px-4 py-2 bg-slate-50 dark:bg-[#121826] border border-slate-200 dark:border-[#2A364A] rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500"
                     value={newAcordo.valor_parcela}
                     onChange={(e) => setNewAcordo({ ...newAcordo, valor_parcela: e.target.value })}

@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { query } from '../config/database.ts';
-import { cobrancaService } from '../services/cobrancaService.ts';
+import { cobrancaService, formatarData, formatarMoeda } from '../services/cobrancaService.ts';
 
 /**
  * Controller responsavel por listar e manipular titulos financeiros e seus respectivos acordos
@@ -202,14 +202,38 @@ export const titulosController = {
 
   async createAcordo(req: Request, res: Response) {
     const { id } = req.params;
-    const { descricao, valor_total, numero_parcelas, valor_parcela, data_primeira_parcela, observacoes } = req.body;
+    const { 
+      descricao, valor_total, numero_parcelas, valor_parcela, 
+      data_primeira_parcela, observacoes, mensagem_email, mensagem_whatsapp 
+    } = req.body;
+    
     try {
       const result = await query(`
         INSERT INTO acordos (titulo_id, descricao, valor_total, numero_parcelas, valor_parcela, data_primeira_parcela, observacoes)
         VALUES ($1, $2, $3, $4, $5, $6, $7)
         RETURNING id
       `, [id, descricao, valor_total, numero_parcelas, valor_parcela, data_primeira_parcela ? data_primeira_parcela : null, observacoes]);
+      
       await query('UPDATE metricas SET acordos_fechados = acordos_fechados + 1 WHERE data = CURRENT_DATE');
+
+      // Tenta enviar as mensagens se houver conteúdo
+      const overrides = {
+        vencimento: data_primeira_parcela ? formatarData(data_primeira_parcela) : '',
+        valor: valor_parcela ? formatarMoeda(Number(valor_parcela)) : ''
+      };
+
+      if (mensagem_email) {
+        await cobrancaService.cobrarTituloManual(parseInt(id), 'email', mensagem_email, overrides).catch(err => {
+          console.error('Erro ao enviar e-mail do acordo:', err.message);
+        });
+      }
+
+      if (mensagem_whatsapp) {
+        await cobrancaService.cobrarTituloManual(parseInt(id), 'whatsapp', mensagem_whatsapp, overrides).catch(err => {
+          console.error('Erro ao enviar WhatsApp do acordo:', err.message);
+        });
+      }
+
       res.json({ id: result.rows[0].id, success: true });
     } catch (error: any) {
       res.status(500).json({ error: error.message });
@@ -218,13 +242,40 @@ export const titulosController = {
 
   async updateAcordo(req: Request, res: Response) {
     const { id } = req.params;
-    const { descricao, valor_total, numero_parcelas, valor_parcela, data_primeira_parcela, observacoes, status } = req.body;
+    const { 
+      descricao, valor_total, numero_parcelas, valor_parcela, 
+      data_primeira_parcela, observacoes, status, 
+      mensagem_email, mensagem_whatsapp, titulo_id
+    } = req.body;
+    
     try {
       await query(`
         UPDATE acordos 
         SET descricao = $1, valor_total = $2, numero_parcelas = $3, valor_parcela = $4, data_primeira_parcela = $5, observacoes = $6, status = $7
         WHERE id = $8
       `, [descricao, valor_total, numero_parcelas, valor_parcela, data_primeira_parcela ? data_primeira_parcela : null, observacoes, status || 'Ativo', id]);
+
+      // No update, também permitimos o disparo se mensagens forem fornecidas
+      const targetTituloId = titulo_id; // Precisamos do ID do título para cobrar
+      const overrides = {
+        vencimento: data_primeira_parcela ? formatarData(data_primeira_parcela) : '',
+        valor: valor_parcela ? formatarMoeda(Number(valor_parcela)) : ''
+      };
+      
+      if (targetTituloId) {
+        if (mensagem_email) {
+          await cobrancaService.cobrarTituloManual(targetTituloId, 'email', mensagem_email, overrides).catch(err => {
+            console.error('Erro ao enviar e-mail do acordo (update):', err.message);
+          });
+        }
+
+        if (mensagem_whatsapp) {
+          await cobrancaService.cobrarTituloManual(targetTituloId, 'whatsapp', mensagem_whatsapp, overrides).catch(err => {
+            console.error('Erro ao enviar WhatsApp do acordo (update):', err.message);
+          });
+        }
+      }
+
       res.json({ success: true });
     } catch (error: any) {
       res.status(500).json({ error: error.message });
