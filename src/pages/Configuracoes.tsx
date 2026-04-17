@@ -180,7 +180,7 @@ export default function Configuracoes() {
               <UserPlus className="w-5 h-5 text-indigo-600" />
               Novo Usuário
             </h3>
-            <form onSubmit={handleCreateUser} className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <form onSubmit={handleCreateUser} autoComplete="off" className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-1.5">
                 <label className="text-sm font-medium text-slate-700 dark:text-slate-200">Nome Completo</label>
                 <input 
@@ -208,6 +208,7 @@ export default function Configuracoes() {
                   value={newUser.email}
                   onChange={e => setNewUser({...newUser, email: e.target.value})}
                   className="w-full px-3 py-2 bg-slate-50 dark:bg-[#121826] border border-slate-200 dark:border-[#2A364A] rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500" 
+                  autoComplete="new-email"
                   required
                 />
               </div>
@@ -218,6 +219,7 @@ export default function Configuracoes() {
                   value={newUser.password}
                   onChange={e => setNewUser({...newUser, password: e.target.value})}
                   className="w-full px-3 py-2 bg-slate-50 dark:bg-[#121826] border border-slate-200 dark:border-[#2A364A] rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500" 
+                  autoComplete="new-password"
                   required
                 />
               </div>

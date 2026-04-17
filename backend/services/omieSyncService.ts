@@ -147,6 +147,7 @@ export const omieSyncService = {
     await query(`
       CREATE TABLE IF NOT EXISTS logs (
         id SERIAL PRIMARY KEY,
+        usuario_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
         timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         tipo TEXT,
         mensagem TEXT,
@@ -180,6 +181,7 @@ export const omieSyncService = {
 
     // Migrações para bases existentes
     await query(`ALTER TABLE cobrancas_enviadas ADD COLUMN IF NOT EXISTS detalhes TEXT;`);
+    await query(`ALTER TABLE logs ADD COLUMN IF NOT EXISTS usuario_id INTEGER REFERENCES users(id) ON DELETE SET NULL;`);
     try {
       await query(`ALTER TABLE metricas ADD CONSTRAINT metricas_data_unique UNIQUE (data);`);
     } catch { /* constraint já existe */ }

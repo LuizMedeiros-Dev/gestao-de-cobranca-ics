@@ -271,9 +271,8 @@ export const dashboardController = {
         { id: 4, nome: 'Taxa de Entrega', valor: `${(Number(lastMetrica?.taxa_entrega) || 0).toFixed(1)}%`, ultima_atualizacao: lastMetrica?.data || new Date().toISOString() },
       ];
 
-      const logsResult = await query('SELECT id, timestamp as data, tipo, mensagem as acao, detalhes FROM logs ORDER BY timestamp DESC LIMIT 20');
-
-      res.json({ metrics, logs: logsResult.rows });
+      // Logs removidos do front-end por questões de segurança (Acessados apenas no banco de dados)
+      res.json({ metrics, logs: [] });
     } catch (error: any) {
       res.status(500).json({ error: error.message });
     }

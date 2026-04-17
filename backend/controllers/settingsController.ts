@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { query } from '../config/database.ts';
+import { logService } from '../services/logService.ts';
 import dotenv from 'dotenv';
 dotenv.config();
 
@@ -81,6 +82,7 @@ export const settingsController = {
     const { nome, tipo, conteudo } = req.body;
     try {
       const result = await query('INSERT INTO templates (nome, tipo, conteudo) VALUES ($1, $2, $3) RETURNING id', [nome, tipo, conteudo]);
+      await logService.registrar(res.locals.userId, 'TEMPLATE', 'Template criado', `Nome: ${nome}`);
       res.json({ id: result.rows[0].id });
     } catch (error: any) {
       res.status(500).json({ error: error.message });
@@ -100,6 +102,7 @@ export const settingsController = {
     const { id } = req.params;
     try {
       await query('DELETE FROM templates WHERE id = $1', [id]);
+      await logService.registrar(res.locals.userId, 'TEMPLATE', 'Template apagado', `ID: ${id}`);
       res.json({ success: true });
     } catch (error: any) {
       res.status(500).json({ error: error.message });
@@ -127,6 +130,7 @@ export const settingsController = {
         VALUES ($1, $2, $3, $4)
         RETURNING id
       `, [nome, canal, dias_atraso, template_id]);
+      await logService.registrar(res.locals.userId, 'REGRA', 'Regra criada', `Nome: ${nome}`);
       res.json({ id: result.rows[0].id });
     } catch (error: any) {
       res.status(500).json({ error: error.message });
@@ -140,6 +144,8 @@ export const settingsController = {
     const setClause = keys.map((k, i) => `${k} = $${i + 1}`).join(', ');
     try {
       await query(`UPDATE regras_cobranca SET ${setClause} WHERE id = $${keys.length + 1}`, [...values, id]);
+      const acao = updates.ativo === false ? 'Regra inativada' : (updates.ativo === true ? 'Regra ativada' : 'Regra atualizada');
+      await logService.registrar(res.locals.userId, 'REGRA', acao, `ID: ${id}`);
       res.json({ success: true });
     } catch (error: any) {
       res.status(500).json({ error: error.message });
@@ -149,6 +155,7 @@ export const settingsController = {
     const { id } = req.params;
     try {
       await query('DELETE FROM regras_cobranca WHERE id = $1', [id]);
+      await logService.registrar(res.locals.userId, 'REGRA', 'Regra apagada', `ID: ${id}`);
       res.json({ success: true });
     } catch (error: any) {
       res.status(500).json({ error: error.message });
@@ -284,6 +291,7 @@ export const settingsController = {
         VALUES ($1, $2, $3, $4, $5)
         ON CONFLICT (email) DO UPDATE SET password = EXCLUDED.password, cpf = EXCLUDED.cpf, nome = EXCLUDED.nome, cargo = EXCLUDED.cargo
       `, [nome, email, cpf, hashedPassword, cargo || 'Usuário']);
+      await logService.registrar(res.locals.userId, 'USUARIO', 'Usuário criado/atualizado por registro', `Email: ${email}`);
       res.json({ success: true });
     } catch (error: any) {
       res.status(500).json({ error: error.message });
@@ -330,6 +338,7 @@ export const settingsController = {
         SET nome = $1, email = $2, cpf = $3, cargo = $4 
         WHERE id = $5
       `, [nome, email, cpf, cargo, id]);
+      await logService.registrar(res.locals.userId, 'USUARIO', 'Usuário editado', `ID: ${id}, Nome: ${nome}`);
       res.json({ success: true });
     } catch (error: any) {
       res.status(500).json({ error: error.message });

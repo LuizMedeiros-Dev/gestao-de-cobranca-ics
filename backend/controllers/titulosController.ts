@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { query } from '../config/database.ts';
+import { logService } from '../services/logService.ts';
 import { cobrancaService, formatarData, formatarMoeda } from '../services/cobrancaService.ts';
 
 /**
@@ -183,6 +184,7 @@ export const titulosController = {
         return res.status(400).json({ error: 'Canal deve ser email ou whatsapp' });
       }
       const resultado = await cobrancaService.cobrarTituloManual(parseInt(id), canal, mensagem);
+      await logService.registrar(res.locals.userId, 'COBRANCA_MANUAL', `Cobrança manual enviada via ${canal}`, `Título ID: ${id}`);
       res.json(resultado);
     } catch (error: any) {
       res.status(500).json({ error: error.message });
@@ -234,6 +236,7 @@ export const titulosController = {
         });
       }
 
+      await logService.registrar(res.locals.userId, 'ACORDO', 'Acordo criado', `Título ID: ${id}, Total: R$ ${valor_total}`);
       res.json({ id: result.rows[0].id, success: true });
     } catch (error: any) {
       res.status(500).json({ error: error.message });

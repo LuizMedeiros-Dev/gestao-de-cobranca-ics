@@ -21,9 +21,9 @@ const transporter = nodemailer.createTransport({
 function wrapHtmlProfissional(conteudo: string, subject: string, variaveis?: any, useCidHeader?: boolean): string {
   const ano = new Date().getFullYear();
   let detalhesEButton = '';
-  
-  const headerLogoHtml = useCidHeader ? 
-    `<img src="cid:logo_ics" alt="ICS 30 SAÚDE INTELIGENTE" style="max-height: 80px; width: auto; display: block; margin: 0 auto; margin-bottom: 24px;" />` : 
+
+  const headerLogoHtml = useCidHeader ?
+    `<img src="cid:logo_ics" alt="ICS 30 SAÚDE INTELIGENTE" style="max-height: 80px; width: auto; display: block; margin: 0 auto; margin-bottom: 24px;" />` :
     `<div class="header-logo" style="font-size: 54px; font-weight: 900; color: #1a365d; letter-spacing: -2px; line-height: 1; margin-bottom: 5px;">
       ICS<span class="header-logo-outline" style="color: transparent; -webkit-text-stroke: 1.5px #ff4d4f; margin-left: 4px;">30</span>
     </div>
@@ -38,6 +38,15 @@ function wrapHtmlProfissional(conteudo: string, subject: string, variaveis?: any
     <div style="font-size: 7px; font-weight: bold; color: #1a365d; letter-spacing: 3px; margin-bottom: 24px;">SAÚDE INTELIGENTE</div>`;
 
   if (variaveis) {
+    let waMessage = 'Olá! Gostaria do link/boleto para pagamento do(s) meu(s) título(s) em aberto.';
+    if (variaveis.cliente || variaveis.nf) {
+      const extraInfo = [];
+      if (variaveis.cliente) extraInfo.push(`Cliente: ${variaveis.cliente}`);
+      if (variaveis.nf) extraInfo.push(`NF: ${variaveis.nf}`);
+      if (extraInfo.length > 0) waMessage += ` (${extraInfo.join(' | ')})`;
+    }
+    const waLink = `https://wa.me/5562998560045?text=${encodeURIComponent(waMessage)}`;
+
     detalhesEButton = `
       <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="margin-top: 24px;">
         <tr>
@@ -71,7 +80,7 @@ function wrapHtmlProfissional(conteudo: string, subject: string, variaveis?: any
         </tr>
         <tr>
           <td align="center" style="padding-top: 32px;">
-            <a href="https://wa.me/5562998560045?text=Ol%C3%A1!%20Gostaria%20do%20link/boleto%20para%20pagamento%20do(s)%20meu(s)%20t%C3%ADtulo(s)%20em%20aberto." style="display: inline-block; background-color: #ff6b6b; color: #ffffff; padding: 14px 40px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 16px;">PAGAR AGORA</a>
+            <a href="${waLink}" style="display: inline-block; background-color: #ff6b6b; color: #ffffff; padding: 14px 40px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 16px;">PAGAR AGORA</a>
           </td>
         </tr>
         <tr>
