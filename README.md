@@ -89,7 +89,7 @@ npm run seed
 ## 📦 Scripts Disponíveis
 
 * `npm run dev`: Inicia o servidor local integrado (API + Frontend Vite HMR).
-* `npm run seed`: Cria ou reseta o usuário administrador padrão (`admin@admin.com`).
+* `npm run seed`: Cria ou reseta o usuário administrador padrão.
 * `npm run build`: Compila o front-end React gerando os arquivos estáticos otimizados na pasta `dist/`.
 * `npm start`: Inicia o servidor em modo produção utilizando os arquivos compilados da pasta `dist/`.
 
