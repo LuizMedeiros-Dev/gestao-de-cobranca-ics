@@ -81,11 +81,7 @@ Para gerar as credenciais de acesso do administrador no banco recém-criado, exe
 ```bash
 npm run seed
 ```
-
-Este comando criará (ou atualizará) o usuário administrativo:
-* **E-mail:** `admin@admin.com`
-* **Senha:** `Admin@123`
-
+`
 *(Você também pode alterar ou cadastrar novos usuários acessando o menu **Usuários / Configurações** no painel).*
 
 ---
