@@ -179,7 +179,7 @@ export const emailService = {
     }
 
     // CIDs Support
-    const logoRelPaths = ['assets/logo.png', 'backend/assets/logo.png', 'dist/assets/logo.png', 'public/logo.png'];
+    const logoRelPaths = ['assets/logo.png', 'server/assets/logo.png', 'backend/assets/logo.png', 'dist/assets/logo.png', 'public/logo.png'];
     let logoPath = '';
     for (const p of logoRelPaths) {
       if (fs.existsSync(path.join(process.cwd(), p))) {

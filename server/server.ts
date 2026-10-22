@@ -1,9 +1,9 @@
 import express from 'express';
 import { createServer as createViteServer } from 'vite';
 import path from 'path';
-import apiRoutes from './backend/routes/api.ts';
-import omieRoutes from './backend/routes/omieRoutes.ts';
-import { initSyncJob } from './backend/jobs/syncJob.ts';
+import apiRoutes from './routes/api.ts';
+import omieRoutes from './routes/omieRoutes.ts';
+import { initSyncJob } from './jobs/syncJob.ts';
 
 async function startServer() {
   const app = express();

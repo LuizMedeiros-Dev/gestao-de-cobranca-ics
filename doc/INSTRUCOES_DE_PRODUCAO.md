@@ -38,7 +38,7 @@ Para iniciar definitivamente a aplicação para os usuários utilizarem (API e F
 # Executa o sistema indicando que está em ambiente de Produção
 NODE_ENV=production npm start
 ```
-> O comando `npm start` já executa o script do `tsx server.ts`. O modo production garante que nenhuma alteração via Vite seja injetada no código rodando.
+> O comando `npm start` já executa o script do `tsx server/server.ts`. O modo production garante que nenhuma alteração via Vite seja injetada no código rodando.
 
 ### Testando
 O servidor assumirá a **Porta 3000** por padrão. Confirme a saúde da aplicação testando no navegador ou enviando um ping via cURL (Ex: `http://ip-da-vm:3000/api/health`).
